@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BilikTap Antigravity MVP 🚀
 
-## Getting Started
+BilikTap müəllimlər və tələbələri bir araya gətirən tam müasir, yüksək sürətli (Antigravity dizaynlı) və interaktiv təhsil platformasıdır.
 
-First, run the development server:
+## 🌟 Əsas Xüsusiyyətlər
+- **Antigravity UI/UX:** Qaranlıq mövzu, yaşıl və mavi vurğularla sürətli və yüngül interfeys.
+- **Xəritə Üzərindən Kəşf (Google Maps API):** Müəllimləri şəhərin fərqli bölgələrində dinamik şəkildə tapın.
+- **Reels Tərzində Videolar:** Müəllimləri və onların dərslərini birbaşa qısa videolar şəklində izləyin, yadda saxlayın və bəyənin (Optimistic UI mantığı ilə).
+- **Təhlükəsiz Autentifikasiya:** NextAuth və bcrypt vasitəsilə 100% təhlükəsiz giriş/qeydiyyat sistemi və qorunan panellər.
+- **Dinamik Filtrləmə Sistemi:** Müəllimləri ixtisaslara, qiymətlərə və "Antigravity" balına görə saniyələr içində tapın.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠 İstifadədə Olan Texnologiyalar
+- **Frontend/Backend:** Next.js 15 (App Router), Server Actions
+- **Verilənlər Bazası:** Prisma (SQLite)
+- **Stil və Dizayn:** TailwindCss v4, Glassmorphism effektləri, Lucide-React
+- **Autentifikasiya:** NextAuth.js (Credentials Provider)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Necə Başlamalı?
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Layihəni kompüterinizə yükləyin (və ya Clone edin):
+   ```bash
+   git clone https://github.com/SƏNİN_ADIN/biliktap-mpv.git
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Paketləri quraşdırın:
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. `.env` faylı yaradın və aşağıdakıları daxil edin:
+   ```env
+   DATABASE_URL="file:./dev.db"
+   AUTH_SECRET="my-super-secret-antigravity-key"
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="AIz...Sizin Google Maps Açarınız"
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Verilənlər bazasını sinxronlaşdırın və ilk məlumatları (20 test müəllimi) yükləyin:
+   ```bash
+   npx prisma db push
+   npx tsx prisma/seed.ts
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Serveri başladın:
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Server işə düşdükdən sonra brauzerdə `http://localhost:3000` linkinə daxil olaraq layihəni incələyə bilərsiniz. Uğurlar! 🛸
