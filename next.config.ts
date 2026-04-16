@@ -1,10 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  // Disable Turbopack - use stable webpack bundler for production
-  experimental: {
-    turbo: undefined,
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
