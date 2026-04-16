@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password      String?
+  image         String?
+  role          String    @default("STUDENT") // STUDENT or TUTOR
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tutorProfile    TutorProfile?
+  studentBookings Booking[]     @relation("StudentBookings")
+  studentReviews  Review[]      @relation("StudentReviews")
+}
+
+model TutorProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  bio             String
+  experienceYears Int      @default(0)
+  pricePerHour    Float    @default(0)
+  
+  lat             Float?
+  lng             Float?
+  locationString  String?
+  
+  isVerified      Boolean  @default(false)
+  smartScore      Float    @default(0)
+
+  subjects        Subject[] 
+  videos          Video[]
+  reviews         Review[]  @relation("TutorReviews")
+  bookings        Booking[] @relation("TutorBookings")
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Subject {
+  id            String         @id @default(uuid())
+  name          String         @unique // e.g., Math, Physics, English
+  tutorProfiles TutorProfile[]
+}
+
+model Video {
+  id           String        @id @default(uuid())
+  tutorId      String
+  tutorProfile TutorProfile  @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  
+  url          String        // Path to the video file
+  thumbnailUrl String?
+  title        String?
+  durationSec  Int           @default(30)
+  
+  viewCount    Int           @default(0)
+  likes        Int           @default(0)
+
+  createdAt    DateTime      @default(now())
+}
+
+model Review {
+  id                  String        @id @default(uuid())
+  tutorId             String
+  studentId           String
+  
+  tutorProfile        TutorProfile  @relation("TutorReviews", fields: [tutorId], references: [id], onDelete: Cascade)
+  studentUser         User          @relation("StudentReviews", fields: [studentId], references: [id], onDelete: Cascade)
+
+  // Granular ratings
+  rating              Float         // Overall rating 1 to 5
+  explanationRating   Float?
+  communicationRating Float?
+  punctualityRating   Float?
+  
+  comment             String?
+
+  createdAt           DateTime      @default(now())
+}
+
+model Booking {
+  id            String        @id @default(uuid())
+  tutorId       String
+  studentId     String
+  
+  tutorProfile  TutorProfile  @relation("TutorBookings", fields: [tutorId], references: [id], onDelete: Cascade)
+  studentUser   User          @relation("StudentBookings", fields: [studentId], references: [id], onDelete: Cascade)
+
+  status        String        @default("PENDING") // PENDING, ACCEPTED, DECLINED, COMPLETED
+  scheduledAt   DateTime
+  message       String?
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
