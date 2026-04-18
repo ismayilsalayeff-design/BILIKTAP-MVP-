@@ -31,7 +31,6 @@ export default async function Navbar() {
         </div>
       </Link>
 
-      {/* Main Nav Items (Desktop) */}
       <div className="hidden md:flex items-center gap-8 font-medium text-gray-300">
         <Link href="/" className="hover:text-brand-green-500 transition flex items-center gap-2">
           <MapIcon size={20} />
@@ -40,10 +39,6 @@ export default async function Navbar() {
         <Link href="/reels" className="hover:text-brand-blue-500 transition flex items-center gap-2">
           <PlaySquare size={20} />
           Reels
-        </Link>
-        <Link href="/search" className="hover:text-brand-green-500 transition flex items-center gap-2">
-          <Search size={20} />
-          Axtarış
         </Link>
       </div>
 
