@@ -5,40 +5,94 @@ const prisma = new PrismaClient();
 
 const subjects = [
   "Azərbaycan dili", "Riyaziyyat", "İngilis dili", "Tarix", 
-  "Fizika", "Proqramlaşdırma", "Kimya", "Biologiya"
+  "Fizika", "Proqramlaşdırma", "Kimya", "Biologiya", "İnformatika"
+];
+
+const specificTutors = [
+  { name: "Zöhrab Əliyev", subject: "Fizika", price: 100, loc: "Bakı, Neftçilər", lat: 40.411, lng: 49.943 },
+  { name: "Rövşən Səfərov", subject: "Riyaziyyat", price: 100, loc: "Bakı, Qara Qarayev", lat: 40.418, lng: 49.932 },
+  { name: "Günel İsmayilova", subject: "Azərbaycan dili", price: 100, loc: "Bakı, 8-ci km", lat: 40.422, lng: 49.954 },
+  { name: "Samirə Abutalıbova", subject: "İngilis dili", price: 100, loc: "Gəncə", lat: 40.68, lng: 46.36 },
+  { name: "Anar Rəşidov", subject: "İnformatika", price: 100, loc: "Naxçıvan", lat: 39.21, lng: 45.41 },
+];
+
+const regions = [
+  { name: "Bakı", lat: 40.40, lng: 49.86 },
+  { name: "Gəncə", lat: 40.68, lng: 46.36 },
+  { name: "Naxçıvan", lat: 39.21, lng: 45.41 },
+  { name: "Lənkəran", lat: 38.75, lng: 48.85 },
+  { name: "Sumqayıt", lat: 40.58, lng: 49.67 }
 ];
 
 const firstNames = ["Aynur", "Rəşad", "Fidan", "Orxan", "Leyla", "Tofiq", "Səidə", "Nurlan", "Zəhra", "Cavidan", "Aysel", "Emil", "Günay", "Ramin", "Lalə", "Samir", "Nəzrin", "Kamil", "Fəridə", "İlham"];
 const lastNames = ["Əliyeva", "Məmmədov", "Qasımlı", "Həsənov", "Rüstəmova", "Quliyev", "Hüseynova", "İsmayılov", "Abbasova", "Sultanov", "Əkbərova", "Nağıyev", "Cəfərova", "Nəbiyev", "Babayeva", "Muradov", "Şükürova", "Qədimov", "Seyidova", "Rəhimov"];
 
 async function main() {
-  console.log("Seeding database with 20 tutors...");
+  console.log("Seeding database...");
 
-  // Create subjects first
-  const subjectRecords = [];
+  // Create subjects
+  const subjectMap: Record<string, any> = {};
   for (const name of subjects) {
     const s = await prisma.subject.upsert({
       where: { name },
       update: {},
       create: { name }
     });
-    subjectRecords.push(s);
+    subjectMap[name] = s;
   }
 
   const hashedPassword = await bcrypt.hash("123456", 10);
 
-  // Generate 20 tutors
-  for (let i = 0; i < 20; i++) {
-    const fName = firstNames[i];
-    const lName = lastNames[i];
-    const email = `tutor${i + 1}@biliktap.az`;
-    const randomSubj = subjectRecords[Math.floor(Math.random() * subjectRecords.length)];
-    const lat = 40.35 + Math.random() * 0.1; // random spread around Baku
-    const lng = 49.82 + Math.random() * 0.1;
+  // 1. Create Specific Tutors
+  console.log("Creating specific tutors...");
+  const createdTutors = [];
+  for (const t of specificTutors) {
+    const email = t.name.toLowerCase().replace(/ /g, ".") + "@biliktap.az";
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: {
+        name: t.name,
+        email: email,
+        password: hashedPassword,
+        role: "TUTOR",
+        tutorProfile: {
+          create: {
+            bio: `Mən ${t.name}. ${t.subject} fənni üzrə peşəkar tədris xidməti təklif edirəm.`,
+            experienceYears: 5,
+            pricePerHour: t.price,
+            lat: t.lat,
+            lng: t.lng,
+            locationString: t.loc,
+            isVerified: true,
+            smartScore: 4.9,
+            subjects: {
+              connect: { id: subjectMap[t.subject].id }
+            }
+          }
+        }
+      },
+      include: { tutorProfile: true }
+    });
+    createdTutors.push(user.tutorProfile!);
+  }
 
-    const price = Math.floor(Math.random() * 15 + 5) * 10; // 50 to 200
-    const score = 4.0 + Math.random(); // 4.0 to 5.0
-    const exp = Math.floor(Math.random() * 10) + 1; // 1 to 10
+  // 2. Generate 195 random tutors spread across regions
+  console.log("Generating 195 random tutors across Azerbaijan...");
+  for (let i = 0; i < 195; i++) {
+    const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const email = `tutor_reg_${i + 1}@biliktap.az`;
+    const randomSubjName = subjects[Math.floor(Math.random() * subjects.length)];
+    
+    // Choose a random region
+    const region = regions[Math.floor(Math.random() * regions.length)];
+    const lat = region.lat + (Math.random() - 0.5) * 0.05;
+    const lng = region.lng + (Math.random() - 0.5) * 0.05;
+
+    const price = Math.floor(Math.random() * 20 + 5) * 10;
+    const score = 3.5 + Math.random() * 1.5;
+    const exp = Math.floor(Math.random() * 15) + 1;
 
     const user = await prisma.user.upsert({
       where: { email },
@@ -50,19 +104,40 @@ async function main() {
         role: "TUTOR",
         tutorProfile: {
           create: {
-            bio: `Mən ${fName}. Uzun illərdir ki, bu fənn üzrə tədrislə məşğulam.`,
+            bio: `Mən ${fName} ${lName}. Uzun illərdir ki, ${randomSubjName} fənni üzrə tədrislə məşğulam.`,
             experienceYears: exp,
             pricePerHour: price,
             lat,
             lng,
-            locationString: "Bakı şəhəri",
-            isVerified: i % 3 === 0, // Verify some
+            locationString: region.name,
+            isVerified: Math.random() > 0.7,
             smartScore: score,
             subjects: {
-              connect: { id: randomSubj.id }
+              connect: { id: subjectMap[randomSubjName].id }
             }
           }
         }
+      },
+      include: { tutorProfile: true }
+    });
+    if (i < 20) createdTutors.push(user.tutorProfile!); // Take some for videos
+  }
+
+  // 3. Generate Videos (Reels) for some tutors
+  console.log("Creating videos for reels...");
+  const videoTitles = [
+    "Dərsi necə asan öyrənməli?", "1 dəqiqədə mövzu izahı", "İmtahan sirləri", 
+    "Sual-cavab sessiyası", "Niyə məni seçməlisiniz?", "Tələbə uğurları"
+  ];
+
+  for (const tp of createdTutors.slice(0, 30)) {
+    await prisma.video.create({
+      data: {
+        tutorId: tp.id,
+        url: "https://www.w3schools.com/html/mov_bbb.mp4", // placeholder video
+        title: videoTitles[Math.floor(Math.random() * videoTitles.length)],
+        likes: Math.floor(Math.random() * 2000),
+        durationSec: 15 + Math.floor(Math.random() * 45)
       }
     });
   }

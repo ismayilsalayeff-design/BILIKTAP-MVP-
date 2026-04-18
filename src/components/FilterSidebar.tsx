@@ -13,7 +13,8 @@ const subjects = [
   "Fizika",
   "Proqramlaşdırma",
   "Kimya",
-  "Biologiya"
+  "Biologiya",
+  "İnformatika"
 ];
 
 export default function FilterSidebar() {

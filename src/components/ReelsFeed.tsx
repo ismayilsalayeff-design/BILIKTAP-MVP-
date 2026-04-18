@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Heart, MessageCircle, Bookmark, Share2, Info, Check, Star } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, Share2, Info, Check, Star, Search } from "lucide-react";
 import { likeVideo, saveVideo } from "@/actions/reels";
 import Link from "next/link";
 
@@ -17,33 +17,22 @@ interface Reel {
   initialLikes: number;
 }
 
-const mockReels: Reel[] = [
-  {
-    id: "vid-1",
-    url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    tutorId: "demo1",
-    tutorName: "Aynur Əliyeva",
-    subject: "Azərbaycan dili",
-    rating: 4.8,
-    price: 60,
-    title: "Mürəkkəb cümlələrin sirri",
-    initialLikes: 1240,
-  },
-  {
-    id: "vid-2",
-    url: "https://www.w3schools.com/html/mov_bbb.mp4", // Mock video
-    tutorId: "demo2",
-    tutorName: "Rəşad Məmmədov",
-    subject: "Riyaziyyat",
-    rating: 5.0,
-    price: 100,
-    title: "Triqonometriyanı 1 dəqiqədə anla!",
-    initialLikes: 300,
-  }
-];
+const mockReels: Reel[] = [];
 
-export default function ReelsFeed({ activeReels = mockReels }: { activeReels?: Reel[] }) {
+export default function ReelsFeed({ activeReels = [] }: { activeReels?: Reel[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  if (activeReels.length === 0) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-[#06090e] text-gray-400 gap-4 p-8 text-center">
+         <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
+            <Search className="w-10 h-10 opacity-20" />
+         </div>
+         <h3 className="text-xl font-bold text-white">Video tapılmadı</h3>
+         <p className="max-w-xs text-sm">Hazırda sistemdə izləməyə video yoxdur. Tezliklə yeni realslar əlavə olunacaq!</p>
+      </div>
+    );
+  }
   
   return (
     <div className="w-full h-[calc(100vh-4rem)] flex justify-center bg-black overflow-hidden relative">
