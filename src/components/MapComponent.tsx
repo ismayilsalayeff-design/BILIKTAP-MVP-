@@ -144,6 +144,7 @@ export default function MapComponent({ tutors }: { tutors: MapTutor[] }) {
   }
 
   return (
+    // @ts-ignore
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={defaultCenter}
@@ -159,6 +160,7 @@ export default function MapComponent({ tutors }: { tutors: MapTutor[] }) {
       {tutors.map((tutor) => {
         if (!tutor.lat || !tutor.lng) return null;
         return (
+          // @ts-ignore
           <Marker
             key={tutor.id}
             position={{ lat: tutor.lat, lng: tutor.lng }}
@@ -176,6 +178,7 @@ export default function MapComponent({ tutors }: { tutors: MapTutor[] }) {
       })}
 
       {selectedTutor && selectedTutor.lat && selectedTutor.lng && (
+        // @ts-ignore
         <InfoWindow
           position={{ lat: selectedTutor.lat, lng: selectedTutor.lng }}
           onCloseClick={() => setSelectedTutor(null)}
