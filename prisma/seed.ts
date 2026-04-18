@@ -28,7 +28,10 @@ const firstNames = ["Aynur", "Rəşad", "Fidan", "Orxan", "Leyla", "Tofiq", "Sə
 const lastNames = ["Əliyeva", "Məmmədov", "Qasımlı", "Həsənov", "Rüstəmova", "Quliyev", "Hüseynova", "İsmayılov", "Abbasova", "Sultanov", "Əkbərova", "Nağıyev", "Cəfərova", "Nəbiyev", "Babayeva", "Muradov", "Şükürova", "Qədimov", "Seyidova", "Rəhimov"];
 
 async function main() {
-  console.log("Seeding database...");
+  console.log("Seeding database (25 tutors total)...");
+
+  // Clean old tutors if using Push
+  // (Optional: prisma.user.deleteMany({ where: { role: 'TUTOR' } }))
 
   // Create subjects
   const subjectMap: Record<string, any> = {};
@@ -77,22 +80,20 @@ async function main() {
     createdTutors.push(user.tutorProfile!);
   }
 
-  // 2. Generate 195 random tutors spread across regions
-  console.log("Generating 195 random tutors across Azerbaijan...");
-  for (let i = 0; i < 195; i++) {
+  // 2. Generate 20 random tutors (Total 25)
+  console.log("Generating 20 random tutors across Azerbaijan...");
+  for (let i = 0; i < 20; i++) {
     const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const email = `tutor_reg_${i + 1}@biliktap.az`;
+    const email = `tutor_final_${i + 1}@biliktap.az`;
     const randomSubjName = subjects[Math.floor(Math.random() * subjects.length)];
     
-    // Choose a random region
     const region = regions[Math.floor(Math.random() * regions.length)];
     const lat = region.lat + (Math.random() - 0.5) * 0.05;
     const lng = region.lng + (Math.random() - 0.5) * 0.05;
 
     const price = Math.floor(Math.random() * 20 + 5) * 10;
     const score = 3.5 + Math.random() * 1.5;
-    const exp = Math.floor(Math.random() * 15) + 1;
 
     const user = await prisma.user.upsert({
       where: { email },
@@ -105,7 +106,7 @@ async function main() {
         tutorProfile: {
           create: {
             bio: `Mən ${fName} ${lName}. Uzun illərdir ki, ${randomSubjName} fənni üzrə tədrislə məşğulam.`,
-            experienceYears: exp,
+            experienceYears: 5,
             pricePerHour: price,
             lat,
             lng,
@@ -120,24 +121,19 @@ async function main() {
       },
       include: { tutorProfile: true }
     });
-    if (i < 20) createdTutors.push(user.tutorProfile!); // Take some for videos
+    createdTutors.push(user.tutorProfile!);
   }
 
-  // 3. Generate Videos (Reels) for some tutors
+  // 3. Generate Videos (Reels) for these tutors
   console.log("Creating videos for reels...");
-  const videoTitles = [
-    "Dərsi necə asan öyrənməli?", "1 dəqiqədə mövzu izahı", "İmtahan sirləri", 
-    "Sual-cavab sessiyası", "Niyə məni seçməlisiniz?", "Tələbə uğurları"
-  ];
-
-  for (const tp of createdTutors.slice(0, 30)) {
+  for (const tp of createdTutors) {
     await prisma.video.create({
       data: {
         tutorId: tp.id,
-        url: "https://www.w3schools.com/html/mov_bbb.mp4", // placeholder video
-        title: videoTitles[Math.floor(Math.random() * videoTitles.length)],
-        likes: Math.floor(Math.random() * 2000),
-        durationSec: 15 + Math.floor(Math.random() * 45)
+        url: "https://www.w3schools.com/html/mov_bbb.mp4",
+        title: "Tədris videosu",
+        likes: Math.floor(Math.random() * 500),
+        durationSec: 30
       }
     });
   }

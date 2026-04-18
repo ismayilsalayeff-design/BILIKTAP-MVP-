@@ -23,6 +23,7 @@ export default async function Home({
       user: query ? { 
         name: { 
           contains: query,
+          mode: 'insensitive',
         } 
       } : undefined,
     },

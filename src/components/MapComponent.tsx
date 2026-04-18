@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import Link from "next/link";
 import { User, Star } from "lucide-react";
@@ -123,6 +123,30 @@ export default function MapComponent({ tutors }: { tutors: MapTutor[] }) {
   const onUnmount = useCallback(function callback() {
     setMap(null);
   }, []);
+
+  // Antigravity Auto-Fit Bounds
+  useEffect(() => {
+    if (map && tutors && tutors.length > 0) {
+      const bounds = new window.google.maps.LatLngBounds();
+      let hasValidPoints = false;
+      tutors.forEach(t => {
+        if (t.lat && t.lng) {
+          bounds.extend({ lat: t.lat, lng: t.lng });
+          hasValidPoints = true;
+        }
+      });
+      if (hasValidPoints) {
+        map.fitBounds(bounds);
+        // Prevent too much zoom if there's only one point
+        if (tutors.length === 1) {
+          const listener = window.google.maps.event.addListener(map, "idle", () => {
+            map.setZoom(12);
+            window.google.maps.event.removeListener(listener);
+          });
+        }
+      }
+    }
+  }, [map, tutors]);
 
   if (loadError) {
     return (
