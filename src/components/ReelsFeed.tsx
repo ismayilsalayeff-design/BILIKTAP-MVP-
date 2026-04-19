@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Heart, MessageCircle, Bookmark, Share2, Info, Check, Star, Search } from "lucide-react";
 import { likeVideo, saveVideo } from "@/actions/reels";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Reel {
   id: string;
@@ -17,9 +18,8 @@ interface Reel {
   initialLikes: number;
 }
 
-const mockReels: Reel[] = [];
-
 export default function ReelsFeed({ activeReels = [] }: { activeReels?: Reel[] }) {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
 
   if (activeReels.length === 0) {
@@ -28,8 +28,8 @@ export default function ReelsFeed({ activeReels = [] }: { activeReels?: Reel[] }
          <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
             <Search className="w-10 h-10 opacity-20" />
          </div>
-         <h3 className="text-xl font-bold text-white">Video tapılmadı</h3>
-         <p className="max-w-xs text-sm">Hazırda sistemdə izləməyə video yoxdur. Tezliklə yeni realslar əlavə olunacaq!</p>
+         <h3 className="text-xl font-bold text-white">{t("reels.noVideos")}</h3>
+         <p className="max-w-xs text-sm">{t("reels.noVideosDesc")}</p>
       </div>
     );
   }
@@ -50,6 +50,7 @@ export default function ReelsFeed({ activeReels = [] }: { activeReels?: Reel[] }
 }
 
 function ReelElement({ reel }: { reel: Reel }) {
+  const { t, language } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
@@ -90,7 +91,6 @@ function ReelElement({ reel }: { reel: Reel }) {
     if (liked) return;
     setLiked(true);
     setLikesCount(prev => prev + 1);
-    // Silent background execution for "Antigravity Speed"
     likeVideo(reel.id).catch(console.error);
   };
 
@@ -117,7 +117,6 @@ function ReelElement({ reel }: { reel: Reel }) {
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 bg-black/30">
           <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center pl-1 border border-white/20">
-            <Share2 className="text-white fill-white w-8 h-8 opacity-70" />
             <div className="w-0 h-0 border-t-8 border-t-transparent border-l-[14px] border-l-brand-green-500 border-b-8 border-b-transparent ml-2 drop-shadow-[0_0_8px_rgba(0,223,137,0.8)]"/>
           </div>
         </div>
@@ -147,7 +146,7 @@ function ReelElement({ reel }: { reel: Reel }) {
               <Bookmark size={28} className="text-white" />
             )}
           </div>
-          <span className="text-[13px] font-bold text-shadow-sm">{saved ? 'Saxlanıldı' : 'Saxla'}</span>
+          <span className="text-[13px] font-bold text-shadow-sm">{saved ? (language === 'aze' ? 'Saxlanıldı' : language === 'rus' ? 'Сохранено' : 'Saved') : (language === 'aze' ? 'Saxla' : language === 'rus' ? 'Сохранить' : 'Save')}</span>
         </button>
       </div>
 
@@ -166,7 +165,7 @@ function ReelElement({ reel }: { reel: Reel }) {
                 <Star size={10} className="fill-yellow-400" /> {reel.rating.toFixed(1)}
               </span>
               <span className="bg-brand-green-500/20 text-brand-green-500 border border-brand-green-500/50 px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide">
-                {reel.price}₼ / aylıq
+                {reel.price}{language === 'aze' ? '₼ / aylıq' : language === 'rus' ? '₼ / мес' : '₼ / mo'}
               </span>
             </div>
             <p className="text-sm text-gray-200 leading-snug drop-shadow-md line-clamp-2">{reel.title}</p>

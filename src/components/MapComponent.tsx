@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import Link from "next/link";
 import { User, Star } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const containerStyle = {
   width: "100%",
@@ -116,6 +117,8 @@ export default function MapComponent({ tutors }: { tutors: MapTutor[] }) {
   const [map, setMap] = useState(null);
   const [selectedTutor, setSelectedTutor] = useState<MapTutor | null>(null);
 
+  const { t, language } = useLanguage();
+
   const onLoad = useCallback(function callback(mapInstance: any) {
     setMap(mapInstance);
   }, []);
@@ -227,12 +230,12 @@ export default function MapComponent({ tutors }: { tutors: MapTutor[] }) {
                 <span>{selectedTutor.rating.toFixed(1)}</span>
               </div>
               <div className="font-bold text-sm text-brand-green-500">
-                {selectedTutor.pricePerHour}₼ / aylıq
+                {selectedTutor.pricePerHour}{t("map.perMonth")}
               </div>
             </div>
 
             <Link href={`/profile/${selectedTutor.id}`} className="block w-full text-center mt-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-medium py-1.5 rounded transition">
-              Profilə bax
+              {t("map.viewProfile")}
             </Link>
           </div>
         </InfoWindow>
