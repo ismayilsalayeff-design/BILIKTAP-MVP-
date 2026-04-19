@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description: "Find, evaluate, and choose the best tutors with blazing speed.",
 };
 
+import { SessionProvider } from "next-auth/react";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,12 +24,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} dark h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-[#06090e] text-white selection:bg-brand-green-500 selection:text-black">
-        <LanguageProvider>
-          <Navbar />
-          <main className="flex-1 w-full pt-16">
-            {children}
-          </main>
-        </LanguageProvider>
+        <SessionProvider>
+          <LanguageProvider>
+            <Navbar />
+            <main className="flex-1 w-full pt-16">
+              {children}
+            </main>
+          </LanguageProvider>
+        </SessionProvider>
       </body>
     </html>
   );
