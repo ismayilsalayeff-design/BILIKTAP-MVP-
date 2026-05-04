@@ -1,6 +1,8 @@
 import ReelsFeed from "@/components/ReelsFeed";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function ReelsPage() {
   const videos = await prisma.video.findMany({
     include: {

@@ -5,20 +5,24 @@ import { prisma } from "@/lib/prisma";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; subject?: string; maxPrice?: string; minRating?: string }>;
+  searchParams: Promise<{ q?: string; subject?: string; minPrice?: string; maxPrice?: string; minRating?: string }>;
 }) {
   const resolvedParams = await searchParams;
   
   // Parsing filters
   const query = resolvedParams.q || "";
   const selectedSubject = resolvedParams.subject;
+  const minPrice = resolvedParams.minPrice ? parseInt(resolvedParams.minPrice) : 0;
   const maxPrice = resolvedParams.maxPrice ? parseInt(resolvedParams.maxPrice) : 250;
   const minRating = resolvedParams.minRating ? parseFloat(resolvedParams.minRating) : 0;
 
   // DB Fetch with Name Search Support
   const rawTutors = await prisma.tutorProfile.findMany({
     where: {
-      pricePerHour: { lte: maxPrice },
+      pricePerHour: { 
+        gte: minPrice,
+        lte: maxPrice 
+      },
       smartScore: { gte: minRating },
       user: query ? { 
         name: { 

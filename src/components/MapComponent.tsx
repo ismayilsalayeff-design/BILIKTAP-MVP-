@@ -114,7 +114,7 @@ export default function MapComponent({ tutors }: { tutors: MapTutor[] }) {
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
   });
 
-  const [map, setMap] = useState(null);
+  const [map, setMap] = useState<any>(null);
   const [selectedTutor, setSelectedTutor] = useState<MapTutor | null>(null);
 
   const { t, language } = useLanguage();
